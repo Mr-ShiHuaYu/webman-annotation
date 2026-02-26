@@ -15,7 +15,7 @@ class BeanRegistrar
     {
         $registry = AnnotationManager::registry();
         $container = self::getContainer();
-        
+
         if (!$container) {
             return;
         }
@@ -24,7 +24,7 @@ class BeanRegistrar
         foreach ($registry->beans as $beanMeta) {
             try {
                 $beanName = $beanMeta->name ?: $beanMeta->class;
-                
+
                 if (self::isRegistered($container, $beanName, $beanMeta->class)) {
                     continue;
                 }
@@ -80,6 +80,18 @@ class BeanRegistrar
             if ($name !== $class) {
                 $container->set($class, $instance);
             }
+        } elseif (method_exists($container, 'addDefinitions')) {
+            // Use addDefinitions with closure that returns pre-created instance
+            $instance = self::createInstance($class);
+            $definitions = [$name => function () use ($instance) {
+                return $instance;
+            }];
+            if ($name !== $class) {
+                $definitions[$class] = function () use ($instance) {
+                    return $instance;
+                };
+            }
+            $container->addDefinitions($definitions);
         }
     }
 
@@ -112,7 +124,7 @@ class BeanRegistrar
     protected static function createInstance(string $class): object
     {
         $instance = new $class();
-        
+
         // Auto-inject Value and Inject annotations
         if (class_exists(AutoInjector::class)) {
             try {
@@ -121,7 +133,7 @@ class BeanRegistrar
 
             }
         }
-        
+
         return $instance;
     }
 
@@ -136,14 +148,14 @@ class BeanRegistrar
                 return true;
             }
         }
-        
+
         // Check by class name
         if (method_exists($container, 'has')) {
             if ($container->has($class)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
