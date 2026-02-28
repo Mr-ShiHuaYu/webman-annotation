@@ -51,7 +51,7 @@
 ### 使用 Composer 安装
 
 ```bash
-composer require x2nx/webman-annotation
+composer require ysh/webman-annotation
 ```
 
 ### 系统要求
@@ -72,7 +72,7 @@ composer require x2nx/webman-annotation
 ### 1. 安装插件
 
 ```bash
-composer require x2nx/webman-annotation
+composer require ysh/webman-annotation
 ```
 
 ### 2. 配置文件
